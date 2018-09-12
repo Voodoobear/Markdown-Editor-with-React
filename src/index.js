@@ -2,7 +2,11 @@ import React from 'react';
 import { render } from 'react-dom';
 import './style/css/bootstrap.min.css';
 import './index.css';
+// JS perso
 import { sampleText } from './sampleText';
+// Marked.js
+import marked from 'marked';
+
 
 class App extends React.Component {
 
@@ -10,11 +14,30 @@ class App extends React.Component {
         text: sampleText
     };
 
+    componentWillMount() {
+        const text = localStorage.getItem('text');
+        
+        if (text) {
+            this.setState({ text })
+        }
+
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        localStorage.setItem('text', nextState.text);
+    }
+
     editText = (event) => {
         const text = event.target.value;
         this.setState({ text });
-    }
+    };
 
+    renderText = (text) => {
+        const renderText = marked(text, {sanitize: true});
+        return {__html: renderText};
+    };
+
+    //rendu
     render() {
         return(
             <div className="container">
@@ -32,9 +55,8 @@ class App extends React.Component {
                     </div>
 
                     <div className="col-sm-6">
-                        <h1>Résultats</h1>
                     </div>
-                    {sampleText}
+                   <div dangerouslySetInnerHTML={this.renderText(this.state.text)} />
                 </div>
             </div>
         )
